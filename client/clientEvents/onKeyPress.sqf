@@ -16,7 +16,6 @@ _alt = _this select 4;
 
 _handled = false;
 
-// ********** Hardcoded keys **********
 switch (true) do
 {
 	// U key
@@ -38,89 +37,66 @@ switch (true) do
 		showPlayerNames = if (isNil "showPlayerNames") then { true } else { !showPlayerNames };
 	};
 
-	// Earplugs - End Key
-	case (_key == 207):
+	case (_key in actionKeys "GetOver"):
 	{
-		if (soundVolume > 0.5) then
+		if (alive player) then
 		{
-			0.5 fadeSound 0.2;
-			["You've inserted your earplugs.", 5] call mf_notify_client;
-		}
-		else
-		{
-			0.5 fadeSound 1;
-			["You've taken out your earplugs.", 5] call mf_notify_client;
-		};
-	};
-};
+			_veh = vehicle player;
 
-// ********** Action keys **********
-
-// Parachute
-if (!_handled && _key in actionKeys "GetOver") then
-{
-	if (alive player) then
-	{
-		_veh = vehicle player;
-
-		if (_veh == player) then
-		{
-			if ((getPos player) select 2 > 2.5) then
+			if (_veh == player) then
 			{
-				true call fn_openParachute;
-				_handled = true;
-			};
-		}
-		else
-		{
-			if (_veh isKindOf "ParachuteBase") then
-			{
-				// 1s cooldown after parachute is deployed so you don't start falling again if you double-tap the key
-				if (isNil "openParachuteTimestamp" || {diag_tickTime - openParachuteTimestamp >= 1}) then
+				if ((getPos player) select 2 > 2.5) then
 				{
-					moveOut player;
-					_veh spawn
+					true call fn_openParachute;
+					_handled = true;
+				};
+			}
+			else
+			{
+				if (_veh isKindOf "ParachuteBase") then
+				{
+					// 1s cooldown after parachute is deployed so you don't start falling again if you double-tap the key
+					if (isNil "openParachuteTimestamp" || {diag_tickTime - openParachuteTimestamp >= 1}) then
 					{
-						sleep 1;
-						deleteVehicle _this;
+						moveOut player;
+						_veh spawn
+						{
+							sleep 1;
+							deleteVehicle _this;
+						};
 					};
 				};
 			};
 		};
 	};
-};
 
-// Eject
-if (!_handled && _key in actionKeys "GetOut") then
-{
-	_veh = vehicle player;
-
-	if (alive player && _veh != player) then
+	// Scoreboard
+	case (_key in actionKeys "NetworkStats"):
 	{
-		if (_ctrl && {_veh isKindOf 'Air' && !(_veh isKindOf 'ParachuteBase')}) then
+		if (_key != 25 || // 25 = P
+		   ((!_ctrl || {!(486539289 in actionKeys "NetworkPlayers") && isNil "TFAR_fnc_TaskForceArrowheadRadioInit"}) && // 486539289 = Left Ctrl + P
+		   (!_shift || {!(704643042 in actionKeys "NetworkPlayers")}))) then // 704643042 = Left Shift + P
 		{
-			[] spawn
+			if (alive player && isNull (uiNamespace getVariable ["ScoreGUI", displayNull])) then
 			{
-				if !(["Are you sure you want to eject?", "Confirm", true, true] call BIS_fnc_guiMessage) exitWith {};
-				[[], fn_emergencyEject] execFSM "call.fsm";
+				call loadScoreboard;
 			};
+
+			_handled = true;
 		};
 	};
-};
 
-// Scoreboard
-if (!_handled && _key in actionKeys "NetworkStats") then
-{
-	if (_key != 25 || // 25 = P
-	   ((!_ctrl || {!(486539289 in actionKeys "NetworkPlayers") && isNil "TFAR_fnc_TaskForceArrowheadRadioInit"}) && // 486539289 = Left Ctrl + P
-	   (!_shift || {!(704643042 in actionKeys "NetworkPlayers")}))) then // 704643042 = Left Shift + P
+	// Ear Plugs - End Key
+	case (_key == 207):
 	{
-		if (alive player && isNull (uiNamespace getVariable ["ScoreGUI", displayNull])) then
+		if (soundVolume <= 0.5) then
 		{
-			call loadScoreboard;
+			0.5 fadeSound 1;
+			["You've taken out your ear plugs.",4] call mf_notify_client;
+		} else {
+			0.5 fadeSound 0.1;
+			["You've inserted your ear plugs.",4] call mf_notify_client;
 		};
-
-		_handled = true;
 	};
 };
 

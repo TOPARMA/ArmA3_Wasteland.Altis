@@ -90,40 +90,40 @@ if (_uid call isAdmin) then
 				case 0: //Access Gun Store
 				{
 					closeDialog 0;
-					[] call loadGunStore;
+					execVM "client\systems\gunStore\loadGunStore.sqf";
 				};
 				case 1: //Access General Store
 				{
 					closeDialog 0;
-					[] call loadGeneralStore;
+					execVM "client\systems\generalStore\loadGenStore.sqf";
 				};
 				case 2: //Access ATM Interface
 				{
 					closeDialog 0;
-					[] call loadVehicleStore;
+					execVM "addons\atm\atm.sqf";
 				};
-				case 3: //Access ATM Dialog
+				case 3: //Access Vehicle Store
 				{
 					closeDialog 0;
-					call mf_items_atm_access;
+					execVM "client\systems\vehicleStore\loadVehicleStore.sqf";
 				};
-				case 4: //Access Respawn Dialog
-				{
-					closeDialog 0;
+			    case 4: //Access Respawn Dialog
+			    {
+	                closeDialog 0;
 					true spawn client_respawnDialog;
-				};
-				case 5: //Access Proving Grounds
-				{
-					closeDialog 0;
+			    };
+			    case 5: //Access Proving Grounds
+			    {
+	                closeDialog 0;
 					createDialog "balca_debug_main";
-				};
-				case 6: //Show server FPS function
-				{
+			    };
+	            case 6: //Show server FPS function
+			    {      
 					hint format["Server FPS: %1",serverFPS];
-				};
-				case 7: //Test Function
-				{
-					_group = createGroup civilian;
+			    };
+	            case 7: //Test Function
+			    {
+                    _group = createGroup civilian;
 					_leader = _group createunit ["C_man_polo_1_F", getPos player, [], 0.5, "Form"];
 
 					_leader addMagazine "RPG32_HE_F";

@@ -6,28 +6,36 @@
 
 #define FILTERED_CHARS [39,58] // single quote, colon
 
-private ["_obj", "_manual", "_objectID", "_updateValues", "_locked", "_deployable"];
+private ["_obj", "_manual", "_objectID", "_props", "_updateValues", "_key", "_val"];
 _obj = _this select 0;
 _manual = if (count _this > 2) then { _this select 2 } else { false };
 
 _objectID = _obj getVariable "A3W_objectID";
 
-if (!alive _obj) exitWith {nil};
-
 if (isNil "_objectID") then
 {
 	_objectID = ([format ["newServerObject:%1:%2", call A3W_extDB_ServerID, call A3W_extDB_MapID], 2] call extDB_Database_async) select 0;
 	_obj setVariable ["A3W_objectID", _objectID, true];
-	A3W_objectIDs pushBack _objectID;
 };
 
-_updateValues = [[_obj] call fn_getObjectProperties, 0] call extDB_pairsToSQL;
+_props = [_obj] call fn_getObjectProperties;
 
-_locked = _obj getVariable ["objectLocked", false];
-_deployable = (_obj getVariable ["a3w_spawnBeacon", false] || _obj getVariable ["a3w_warchest", false]);
+_updateValues = "";
 
-_updateValues = _updateValues + (",Locked=" + (if (_locked) then { "1" } else { "0" }));
-_updateValues = _updateValues + (",Deployable=" + (if (_deployable) then { "1" } else { "0" }));
+{
+	_key = _x select 0;
+	_val = _x select 1;
+
+	_val = if (typeName _val == "SCALAR") then {
+		_val call fn_numToStr
+	} else {
+		format ["'%1'", toString (toArray str _val - FILTERED_CHARS)]
+	};
+
+	_updateValues = _updateValues + format ["%1%2=%3", if (_updateValues != "") then { "," } else { "" }, _key, _val];
+} forEach _props;
+
+_updateValues = _updateValues + format [",Locked=%1", if (_obj getVariable ["objectLocked", false]) then { 1 } else { 0 }];
 
 if (_manual) then
 {

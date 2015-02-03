@@ -236,8 +236,9 @@ if (isServer) then
 			sleep 1;
 
 			_npc enableSimulation false;
-			_desk enableSimulationGlobal false;
+			_desk enableSimulation false;
 		};
+
 	} forEach (call storeOwnerConfig);
 };
 
@@ -261,67 +262,44 @@ if (hasInterface) then
 
 	if (!isNull _desk) then
 	{
-		_desk spawn
+		_sellBox = "Box_IND_Ammo_F" createVehicleLocal getPosATL _desk;
+		_sellBox allowDamage false;
+		_sellBox setVariable ["R3F_LOG_disabled", true];
+		_sellBox setVariable ["A3W_storeSellBox", true];
+		_sellBox setObjectTexture [0, ""]; // remove side marking
+
+		clearBackpackCargo _sellBox;
+		clearMagazineCargo _sellBox;
+		clearWeaponCargo _sellBox;
+		clearItemCargo _sellBox;
+
+		_sellBox setPosASL ((getPosASL _desk) vectorAdd ([[-0.05,-0.6,0], -(getDir _desk)] call BIS_fnc_rotateVector2D));
+		_boxPos = getPos _sellBox;
+
+		if (_boxPos select 2 > 0) then
 		{
-			_desk = _this;
-			_createSellBox =
-			{
-				_deskOffset = (getPosASL _desk) vectorAdd ([[-0.05,-0.6,0], -(getDir _desk)] call BIS_fnc_rotateVector2D);
+			_boxPosASL = getPosASL _sellBox;
+			_boxPosASL set [2, (_boxPosASL select 2) - (_boxPos select 2)];
+			_sellBox setPosASL _boxPosASL;
+		};
 
-				_sellBox = "Box_IND_Ammo_F" createVehicleLocal ASLtoATL _deskOffset;
-				_sellBox allowDamage false;
-				_sellBox setVariable ["R3F_LOG_disabled", true];
-				_sellBox setVariable ["A3W_storeSellBox", true];
-				_sellBox setObjectTexture [0, ""]; // remove side marking
+		_sellBox setDir (getDir _desk + 90);
+		_sellBox addAction ["<img image='client\icons\money.paa'/> Sell bin contents", "client\systems\selling\sellCrateItems.sqf", [true], 1, false, false, "", STORE_ACTION_CONDITION + " && " + SELL_BIN_CONDITION];
 
-				clearBackpackCargo _sellBox;
-				clearMagazineCargo _sellBox;
-				clearWeaponCargo _sellBox;
-				clearItemCargo _sellBox;
+		_sellBox spawn
+		{
+			_sellBox = _this;
+			_boxPos = getPosATL _sellBox;
+			_boxVecDir = vectorDir _sellBox;
+			_boxVecUp = vectorUp _sellBox;
 
-				// must be done twice for the position to set properly
-				for "_i" from 1 to 2 do
-				{
-					_sellBox setVelocity [0,0,0];
-					_sellBox setVectorDirAndUp [[vectorDir _desk, -90] call BIS_fnc_rotateVector2D, [0,0,1]];
-					_sellBox setPosASL _deskOffset;
-					_boxPos = getPos _sellBox;
-
-					if (_boxPos select 2 > 0) then
-					{
-						_boxPosASL = getPosASL _sellBox;
-						_boxPosASL set [2, (_boxPosASL select 2) - (_boxPos select 2)];
-						_sellBox setPosASL _boxPosASL;
-					};
-				};
-
-				_sellBox addAction ["<img image='client\icons\money.paa'/> Sell bin contents", "client\systems\selling\sellCrateItems.sqf", [true], 1, false, false, "", STORE_ACTION_CONDITION + " && " + SELL_BIN_CONDITION];
-
-				_boxPos = getPosATL _sellBox;
-				_boxVecDir = vectorDir _sellBox;
-				_boxVecUp = vectorUp _sellBox;
-			};
-
-			private ["_sellBox", "_boxPos", "_boxVecDir", "_boxVecUp"];
-			call _createSellBox;
-
-			while {true} do
+			while {!isNull _sellBox} do
 			{
 				sleep 5;
-				if (!alive _sellBox) then
+				if ((getPosATL _sellBox) vectorDistance _boxPos > 0.1 || (vectorDir _sellBox) vectorDistance _boxVecDir > 0.1) then
 				{
-					deleteVehicle _sellBox;
-					call _createSellBox;
-				}
-				else
-				{
-					if ((getPosATL _sellBox) vectorDistance _boxPos > 0.1 ||
-					   {(vectorDir _sellBox) vectorDistance _boxVecDir > 0.1} ||
-					   {(vectorUp _sellBox) vectorDistance _boxVecUp > 0.1}) then
-					{
-						_sellBox setPosATL _boxPos;
-						_sellBox setVectorDirAndUp [_boxVecDir, _boxVecUp];
-					};
+					_sellBox setPosATL _boxPos;
+					_sellBox setVectorDirAndUp [_boxVecDir, _boxVecUp];
 				};
 			};
 		};

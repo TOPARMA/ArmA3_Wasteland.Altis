@@ -22,24 +22,19 @@ addMissionEventHandler ["HandleDisconnect",
 	_uid = _this select 2;
 	_name = _this select 3;
 
-	if (alive _unit) then
+	if (alive _unit && (_unit getVariable ["FAR_isUnconscious", 0] == 0) && {!isNil "isConfigOn" && {["A3W_playerSaving"] call isConfigOn}}) then
 	{
-		if ((_unit getVariable ["FAR_isUnconscious", 0] == 0) && {!isNil "isConfigOn" && {["A3W_playerSaving"] call isConfigOn}}) then
+		if (!(_unit getVariable ["playerSpawning", false]) && typeOf _unit != "HeadlessClient_F") then
 		{
-			if (!(_unit getVariable ["playerSpawning", false]) && typeOf _unit != "HeadlessClient_F") then
-			{
-				[_uid, [], [_unit, false] call fn_getPlayerData] spawn fn_saveAccount;
-			};
+			[_uid, [], [_unit, false] call fn_getPlayerData] spawn fn_saveAccount;
+		};
 
-			deleteVehicle _unit;
-		};
-	}
-	else
+		deleteVehicle _unit;
+	};
+
+	if (!isNil "fn_onPlayerDisconnected") then
 	{
-		if (vehicle _unit != _unit && !isNil "fn_ejectCorpse") then
-		{
-			_unit spawn fn_ejectCorpse;
-		};
+		[_id, _uid, _name] spawn fn_onPlayerDisconnected;
 	};
 
 	false
@@ -103,13 +98,7 @@ forEach
 	"A3W_purchasedVehicleSaving",
 	"A3W_missionVehicleSaving",
 	"A3W_missionFarAiDrawLines",
-	"A3W_atmEnabled",
-	"A3W_atmMaxBalance",
-	"A3W_atmTransferFee",
-	"A3W_atmTransferAllTeams",
-	"A3W_atmEditorPlacedOnly",
-	"A3W_atmMapIcons",
-	"A3W_atmRemoveIfDisabled",
+	"A3W_extDB_ServerID",
 	"A3W_extDB_PlayerSave_ServerID",
 	"A3W_extension",
 	"A3W_vehicleThermals",
@@ -133,13 +122,14 @@ vehicleThermalsOn = ["A3W_vehicleThermals"] call isConfigOn;
 _purchasedVehicleSavingOn = ["A3W_purchasedVehicleSaving"] call isConfigOn;
 _missionVehicleSavingOn = ["A3W_missionVehicleSaving"] call isConfigOn;
 
-_objectSavingOn = (_baseSavingOn || _boxSavingOn || _staticWeaponSavingOn || _warchestSavingOn || _warchestMoneySavingOn || _beaconSavingOn);
+_serverSavingOn = (_baseSavingOn || _boxSavingOn || _staticWeaponSavingOn || _warchestSavingOn || _warchestMoneySavingOn || _beaconSavingOn || _purchasedVehicleSavingOn || _missionVehicleSavingOn);
 _vehicleSavingOn = (_purchasedVehicleSavingOn || _purchasedVehicleSavingOn);
 
 _setupPlayerDB = scriptNull;
 
 // Do we need any persistence?
-if (_playerSavingOn || _objectSavingOn || _vehicleSavingOn) then
+
+if (_playerSavingOn || _serverSavingOn) then
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -211,7 +201,7 @@ if (_playerSavingOn || _objectSavingOn || _vehicleSavingOn) then
 
 	if (_playerSavingOn) then
 	{
-		_setupPlayerDB = [] spawn compile preprocessFileLineNumbers "persistence\server\players\setupPlayerDB.sqf"; // scriptDone stays stuck on false when using execVM on Linux
+		_setupPlayerDB = [] spawn compile preprocessFileLineNumbers "persistence\server\players\setupPlayerDB.sqf"; // scriptDone stays stuck on false on Linux servers when using execVM
 
 		// profileNamespace doesn't save antihack logs
 		if (_savingMethod != "profile") then
@@ -227,28 +217,28 @@ if (_playerSavingOn || _objectSavingOn || _vehicleSavingOn) then
 		};
 	};
 
-	[_playerSavingOn, _objectSavingOn, _vehicleSavingOn] spawn
+	[_playerSavingOn, _serverSavingOn, _vehicleSavingOn] spawn
 	{
 		_playerSavingOn = _this select 0;
-		_objectSavingOn = _this select 1;
+		_serverSavingOn = _this select 1;
 		_vehicleSavingOn = _this select 2;
 
-		A3W_objectIDs = [];
-		A3W_vehicleIDs = [];
+		_objectIDs = [];
+		_vehicleIDs = [];
 
-		if (_objectSavingOn) then
+		if (_serverSavingOn) then
 		{
-			call compile preprocessFileLineNumbers "persistence\server\world\oLoad.sqf";
+			_objectIDs = call compile preprocessFileLineNumbers "persistence\server\world\oLoad.sqf";
 		};
 		if (_vehicleSavingOn) then
 		{
-			call compile preprocessFileLineNumbers "persistence\server\world\vLoad.sqf";
+			_vehicleIDs = call compile preprocessFileLineNumbers "persistence\server\world\vLoad.sqf";
 		};
 
-		if (_objectSavingOn || _vehicleSavingOn || {_playerSavingOn && call A3W_savingMethod == "profile"}) then
+		if (_serverSavingOn || {_playerSavingOn && call A3W_savingMethod == "profile"}) then
 		{
-			execVM "persistence\server\world\oSave.sqf";
-			//waitUntil {!isNil "A3W_oSaveReady"};
+			[_objectIDs, _vehicleIDs] execVM "persistence\server\world\oSave.sqf";
+			waitUntil {!isNil "A3W_oSaveReady"};
 		};
 	};
 
@@ -335,15 +325,7 @@ if (["A3W_serverSpawning"] call isConfigOn) then
 	{
 		call compile preprocessFileLineNumbers "server\functions\boxSpawning.sqf";
 	};
-
-	if (["A3W_vehicleSpawning"] call isConfigOn || ["A3W_boatSpawning"] call isConfigOn) then
-	{
-		execVM "server\spawning\vehicleRespawnManager.sqf";
-	};
 };
-
-A3W_serverSpawningComplete = compileFinal "true";
-publicVariable "A3W_serverSpawningComplete";
 
 if (count (["config_territory_markers", []] call getPublicVar) > 0) then
 {

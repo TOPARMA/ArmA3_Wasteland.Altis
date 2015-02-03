@@ -173,8 +173,7 @@ class RscPicture
 class RscEdit
 {
 	access = 0;
-	type = CT_EDIT;
-	style = ST_LEFT + ST_FRAME;
+	type = 2;
 	x = 0;
 	y = 0;
 	h = 0.04;
@@ -192,6 +191,7 @@ class RscEdit
 	autocomplete = "";
 	text = "";
 	size = 0.2;
+	style = "0x00 + 0x40";
 	font = "PuristaMedium";
 	shadow = 2;
 	sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
@@ -200,15 +200,11 @@ class RscEdit
 class RscCombo
 {
 	access = 0;
-	type = CT_COMBO;
-	style = SL_TEXTURES + ST_NO_RECT;
+	type = 4;
 	colorSelect[] = {0, 0, 0, 1};
 	colorText[] = {1, 1, 1, 1};
 	colorBackground[] = {0, 0, 0, 1};
 	colorScrollbar[] = {1, 0, 0, 1};
-	colorPicture[] = {1, 1, 1, 1};
-	colorPictureSelected[] = {1, 1, 1, 1};
-	colorPictureDisabled[] = {1, 1, 1, 1};
 	soundSelect[] = {"\A3\ui_f\data\sound\RscCombo\soundSelect", 0.1, 1};
 	soundExpand[] = {"\A3\ui_f\data\sound\RscCombo\soundExpand", 0.1, 1};
 	soundCollapse[] = {"\A3\ui_f\data\sound\RscCombo\soundCollapse", 0.1, 1};
@@ -224,6 +220,7 @@ class RscCombo
 		arrowEmpty = "\A3\ui_f\data\gui\cfg\scrollbar\arrowEmpty_ca.paa";
 		border = "\A3\ui_f\data\gui\cfg\scrollbar\border_ca.paa";
 	};
+	style = "0x10 + 0x200";
 	x = 0;
 	y = 0;
 	w = 0.12;

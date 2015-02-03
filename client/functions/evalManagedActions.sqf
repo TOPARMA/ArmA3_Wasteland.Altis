@@ -6,52 +6,43 @@
 
 if (!hasInterface) exitWith {};
 
-#define MAIN_LOOP_INTERVAL 0.333
-#define START_LOOP_QTY_PER_FRAME 2
-#define MAX_LOOP_QTY_PER_FRAME 10
-
 scriptName "evalManagedActions";
 waitUntil {!isNull player};
 
 managedActions_array = [];
 managedActions_arrayCleanup = false;
 managedActions_arrayEval = false;
-managedActions_doCleanup = false;
-
-_loopQty = START_LOOP_QTY_PER_FRAME;
-_oldCount = 0;
-_totalTime = 0;
 
 while {true} do
 {
-	_startTime = diag_tickTime;
-
 	// Only evaluate conditions if no menus or dialogs are open
-	managedActions_doEval = (!visibleMap && isNull findDisplay 49 && !dialog && alive player);
-	managedActions_doCleanup = false;
+	_doEval = (!visibleMap && isNull findDisplay 49 && !dialog && alive player);
 
+	_cleanup = false;
+	_evalSleepTime = 0.333;
 	_actionsCount = count managedActions_array;
 
 	if (_actionsCount > 0) then
 	{
 		managedActions_arrayEval = true;
 
-		_loopQty = 
-		[{
-			if !(_this isEqualTo -1) then
+		_evalSleepTime = (_evalSleepTime / _actionsCount) max 0.01;
+
+		{
+			if !(_x isEqualTo -1) then
 			{
-				_target = _this select 0;
+				_target = _x select 0;
 
 				if (isNull _target) then
 				{
-					managedActions_doCleanup = true;
+					_cleanup = true;
 				}
 				else
 				{
-					if (managedActions_doEval) then
+					if (_doEval) then
 					{
-						_pvar = _this select 2;
-						_cond = _this select 3;
+						_pvar = _x select 2;
+						_cond = _x select 3;
 
 						if (!isNil _pvar) then
 						{
@@ -60,14 +51,18 @@ while {true} do
 					};
 				};
 			};
-		}, managedActions_array, MAIN_LOOP_INTERVAL, _oldCount, _totalTime, _loopQty, false, MAX_LOOP_QTY_PER_FRAME] call fn_loopSpread;
+
+			uiSleep _evalSleepTime;
+		} forEach managedActions_array;
 
 		managedActions_arrayEval = false;
+	}
+	else
+	{
+		sleep 1;
 	};
 
-	_oldCount = _actionsCount;
-
-	if (managedActions_doCleanup) then
+	if (_cleanup) then
 	{
 		[] spawn
 		{
@@ -93,6 +88,5 @@ while {true} do
 		};
 	};
 
-	_totalTime = diag_tickTime - _startTime;
-	uiSleep (MAIN_LOOP_INTERVAL - _totalTime);
+	//uiSleep 0.15;
 };

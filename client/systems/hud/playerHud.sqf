@@ -87,7 +87,6 @@ _displayTerritoryActivity =
 };
 
 _unlimitedStamina = ["A3W_unlimitedStamina"] call isConfigOn;
-_atmEnabled = ["A3W_atmEnabled"] call isConfigOn;
 
 private ["_globalVoiceTimer", "_globalVoiceWarnTimer", "_globalVoiceWarning", "_globalVoiceMaxWarns", "_globalVoiceTimestamp"];
 
@@ -102,7 +101,7 @@ while {true} do
 {
 	private ["_ui","_vitals","_hudVehicle","_health","_tempString","_yOffset","_vehicle"];
 
-	1000 cutRsc ["WastelandHud","PLAIN",1e10];
+	1000 cutRsc ["WastelandHud","PLAIN"];
 	_ui = uiNameSpace getVariable "WastelandHud";
 	_vitals = _ui displayCtrl hud_status_idc;
 	_hudVehicle = _ui displayCtrl hud_vehicle_idc;
@@ -110,8 +109,8 @@ while {true} do
 	_hudActivityTextbox = _ui displayCtrl hud_activity_textbox_idc;
 	_hudServerTextbox = _ui displayCtrl hud_server_idc;
 	
-	_serverString = format ["<t color='#A0FFFFFF'>Server: TOP #%1 Wasteland Altis</t>", call A3W_extDB_ServerID];
-	_serverString = format ["%1<br/><t color='#A0FFFFFF'>Teamspeak: ts.toparma.com<br/>Website: TOPARMA.COM</t>",_serverString];
+	_serverString = format ["<t color='#A0FFFFFF'>Server: DADS A3Wasteland Altis</t>", call A3W_extDB_ServerID];
+	_serverString = format ["%1<br/><t color='#A0FFFFFF'>Teamspeak: ts1.dadsarmy.se<br/>Website: dadsarmy.se</t>",_serverString];
 	_hudServerTextbox ctrlSetStructuredText parseText _serverString;
 	_hudServerTextbox ctrlCommit 0;
 
@@ -141,27 +140,16 @@ while {true} do
 	_lastHealthReading = _health;
 
 	// Icons in bottom right
-
-	_minimumBRs = 5;
-	_strArray = [];
-
-	if (_atmEnabled) then { _strArray pushBack format ["%1 <img size='0.7' image='client\icons\suatmm_icon.paa'/>", [player getVariable ["bmoney", 0]] call fn_numbersText] };
-	_strArray pushBack format ["%1 <img size='0.7' image='client\icons\money.paa'/>", [player getVariable ["cmoney", 0]] call fn_numbersText];
-	_strArray pushBack format ["%1 <img size='0.7' image='client\icons\water.paa'/>", ceil (thirstLevel max 0)];
-	_strArray pushBack format ["%1 <img size='0.7' image='client\icons\food.paa'/>", ceil (hungerLevel max 0)];
-	if (!_unlimitedStamina) then { _strArray pushBack format ["%1 <img size='0.7' image='client\icons\running_man.paa'/>", 100 - ceil ((getFatigue player) * 100)] };
-	_strArray pushBack format ["<t color='%1'>%2</t> <img size='0.7' image='client\icons\health.paa'/>", _healthTextColor, _health];
-
-	_str = "";
-
-	for "_i" from 0 to (_minimumBRs - count _strArray) do
-	{
-		_str = _str + "<br/>";
+	_str = if (_unlimitedStamina) then {
+		""
+	} else {
+		format ["%1 <img size='0.7' image='client\icons\running_man.paa'/>", 100 - ceil((getFatigue player) * 100)];
 	};
-
-	{
-		_str = _str + format ["%1%2", if (_forEachIndex > 0) then { "<br/>" } else { "" }, _x];
-	} forEach _strArray;
+	_str = format["%1<br/>%2 <img size='0.7' image='client\icons\bank.paa'/>", _str, [player getVariable ["bmoney", 0]] call fn_numbersText];
+	_str = format["%1<br/>%2 <img size='0.7' image='client\icons\money.paa'/>", _str, [player getVariable ["cmoney", 0]] call fn_numbersText];
+	_str = format["%1<br/>%2 <img size='0.7' image='client\icons\water.paa'/>", _str, ceil (thirstLevel max 0)];
+	_str = format["%1<br/>%2 <img size='0.7' image='client\icons\food.paa'/>", _str, ceil (hungerLevel max 0)];
+	_str = format["%1<br/><t color='%2'>%3</t> <img size='0.7' image='client\icons\health.paa'/>", _str, _healthTextColor, _health];
 
 	_vitals ctrlShow alive player;
 	_vitals ctrlSetStructuredText parseText _str;
@@ -344,22 +332,24 @@ while {true} do
 		];
 	};
 
-	if (!isNil "A3W_mapDraw_eventCode") then
+	// Add player markers to misc map controls
 	{
-		// Add custom markers and lines to misc map controls
+		if (isNull (_x select 1)) then
 		{
-			if (isNull (_x select 1)) then
-			{
-				_mapCtrl = call (_x select 0);
+			_mapCtrl = call (_x select 0);
 
-				if (!isNull _mapCtrl) then
+			if (!isNull _mapCtrl) then
+			{
+				_mapCtrl ctrlAddEventHandler ["Draw",
 				{
-					_mapCtrl ctrlAddEventHandler ["Draw", A3W_mapDraw_eventCode];
-					_x set [1, _mapCtrl];
-				};
+					_mapCtrl = _this select 0;
+					{ _mapCtrl drawIcon _x } forEach drawPlayerMarkers_array;
+					{ _mapCtrl drawLine _x } forEach drawPlayerMarkers_arrayLines;
+				}];
+				_x set [1, _mapCtrl];
 			};
-		} forEach _mapCtrls;
-	};
+		};
+	} forEach _mapCtrls;
 
 	uiSleep 1;
 };
