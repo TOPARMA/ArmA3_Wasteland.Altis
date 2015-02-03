@@ -98,7 +98,7 @@ if (isNil "playerData_alive") then
 
 player call playerSetupEnd;
 
-diag_log format ["Player starting with $%1", (player getVariable ["cmoney", 0]) call fn_numToStr];
+diag_log format ["Player starting with $%1", player getVariable ["cmoney", 0]];
 
 [] execVM "territory\client\hideDisabledTerritories.sqf";
 
@@ -136,10 +136,11 @@ A3W_scriptThreads pushBack execVM "addons\fpsFix\vehicleManager.sqf";
 A3W_scriptThreads pushBack execVM "addons\Lootspawner\LSclientScan.sqf";
 [] execVM "client\functions\drawPlayerIcons.sqf";
 [] execVM "addons\far_revive\FAR_revive_init.sqf";
-[] execVM "addons\camera\functions.sqf";
 
-call compile preprocessFileLineNumbers "client\functions\generateAtmArray.sqf";
-[] execVM "client\functions\drawPlayerMarkers.sqf";
+if (["A3W_teamPlayersMap"] call isConfigOn) then
+{
+	[] execVM "client\functions\drawPlayerMarkers.sqf";
+};
 
 // update player's spawn beaoon
 {
@@ -149,9 +150,6 @@ call compile preprocessFileLineNumbers "client\functions\generateAtmArray.sqf";
 		_x setVariable ["side", playerSide, true];
 	};
 } forEach pvar_spawn_beacons;
-
-{ _x call A3W_fnc_setupAntiExplode } forEach allMissionObjects "Air";
-{ _x call A3W_fnc_setupAntiExplode } forEach allMissionObjects "UGV_01_base_F";
 
 {
 	{

@@ -25,9 +25,16 @@ if (typeName _this == "ARRAY" && {count _this > 4}) then
 		[[format ["[ANTI-HACK] %1 is using cheating scripts. (%2)", _playerName, _hackType], _playerUID, _flagChecksum], "A3W_fnc_chatBroadcast", true, false] call A3W_fnc_MP;
 		diag_log format ["ANTI-HACK: %1 (%2) was detected for [%3] with the value [%4]", _playerName, _playerUID, _hackType, _hackValue];
 
-		if (!isNil "fn_logAntihack") then
+		switch (["A3W_savingMethod", "profile"] call getPublicVar) do
 		{
-			[_playerUID, _playerName, _hackType, _hackValue] call fn_logAntihack;
+			case "iniDB":
+			{
+				["Hackers" call PDB_playerFileName, "Hackers", _playerUID, [_playerName, _hackType, _hackValue]] call iniDB_write;
+			};
+			case "extDB":
+			{
+				[format ["addAntihackLog:%1:%2:%3:%4:%5", call A3W_extDB_ServerID, toString (toArray _playerName - toArray ":"), _playerUID, _hackType, _hackValue]] call extDB_Database_async;
+			};
 		};
 	};
 };

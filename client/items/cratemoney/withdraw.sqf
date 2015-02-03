@@ -8,6 +8,7 @@
 #include "defines.sqf"
 
 #define ERR_NOT_ENOUGH_FUNDS "There are not enough funds in the stash."
+#define ERR_LESS_THAN_ONE "The amount must be at least $1"
 
 disableSerialization;
 private ["_crate", "_dialog", "_input", "_amount"];
@@ -19,15 +20,22 @@ if (isNull _dialog) exitWith {};
 if (isNull _crate) exitWith { closeDialog IDD_WARCHEST };
 
 _input = _dialog displayCtrl IDC_AMOUNT;
-_amount = _input call mf_verify_money_input;
+_amount = floor parseNumber ctrlText _input;
+_input ctrlSetText (_amount call fn_numToStr);
 
-if (_amount < 1) exitWith {};
-
-if (_crate getVariable ["cmoney", 0] < _amount) exitWith
+if (_amount < 1) then
 {
-	[ERR_NOT_ENOUGH_FUNDS, 5] call mf_notify_client;
+	[ERR_LESS_THAN_ONE, 5] call mf_notify_client;
 	playSound "FD_CP_Not_Clear_F";
-};
+}
+else
+{
+	if (_crate getVariable ["cmoney", 0] < _amount) exitWith
+	{
+		[ERR_NOT_ENOUGH_FUNDS, 5] call mf_notify_client;
+		playSound "FD_CP_Not_Clear_F";
+	};
 
-pvar_processTransaction = ["crateMoney", player, netId _crate, -_amount];
-publicVariableServer "pvar_processTransaction";
+	pvar_processTransaction = ["crateMoney", player, netId _crate, -_amount];
+	publicVariableServer "pvar_processTransaction";
+};

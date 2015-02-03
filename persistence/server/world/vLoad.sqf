@@ -4,7 +4,7 @@
 //	@file Name: vLoad.sqf
 //	@file Author: AgentRev, JoSchaap, Austerror
 
-private ["_maxLifetime", "_maxUnusedTime", "_worldDir", "_methodDir", "_vehCount", "_vehicles", "_exclVehicleIDs"];
+private ["_maxLifetime", "_maxUnusedTime", "_worldDir", "_methodDir", "_vehCount", "_vehicles", "_vehicleIDs", "_exclVehicleIDs"];
 
 _maxLifetime = ["A3W_vehicleLifetime", 0] call getPublicVar;
 _maxUnusedTime = ["A3W_vehicleMaxUnusedTime", 0] call getPublicVar;
@@ -15,6 +15,7 @@ _methodDir = format ["%1\%2", _worldDir, call A3W_savingMethodDir];
 _vehCount = 0;
 _vehicles = call compile preprocessFileLineNumbers format ["%1\getVehicles.sqf", _methodDir];
 
+_vehicleIDs = [];
 _exclVehicleIDs = [];
 
 {
@@ -88,7 +89,7 @@ _exclVehicleIDs = [];
 		if (!isNil "_vehicleID") then
 		{
 			_veh setVariable ["A3W_vehicleID", _vehicleID, true];
-			A3W_vehicleIDs pushBack _vehicleID;
+			_vehicleIDs pushBack _vehicleID;
 		};
 
 		_veh setVariable ["vehSaving_hoursUnused", _hoursUnused];
@@ -118,7 +119,14 @@ _exclVehicleIDs = [];
 		};
 
 		{ _veh setVariable [_x select 0, _x select 1, true] } forEach _variables;
-
+		
+		// If vehicle is owned by a player, lock it and make it untowable/unliftable Cael817
+		if (!isNil {_veh getVariable "ownerUID"}) then {
+			_veh lock 2;
+			_veh setVariable ["R3F_LOG_disabled",true,true];
+		};
+		
+		
 		clearWeaponCargoGlobal _veh;
 		clearMagazineCargoGlobal _veh;
 		clearItemCargoGlobal _veh;
@@ -183,3 +191,5 @@ diag_log format ["A3Wasteland - world persistence loaded %1 vehicles from %2", _
 
 fn_deleteVehicles = [_methodDir, "deleteVehicles.sqf"] call mf_compile;
 _exclVehicleIDs call fn_deleteVehicles;
+
+_vehicleIDs

@@ -15,8 +15,6 @@
 	Returns:
 	STRING
 */
-if (!finite _this) exitWith { "0" };
-
 private ["_tmp", "_buf", "_rem"];
 _tmp = abs _this;
 _buf = [];
@@ -29,7 +27,7 @@ else
 {
 	while {_tmp >= 1} do
 	{
-		_buf pushBack (48 + floor (_tmp % 10));
+		_buf pushBack (48 + floor (_tmp % 10)); // 48 = "0"
 		_tmp = _tmp / 10;
 	};
 };

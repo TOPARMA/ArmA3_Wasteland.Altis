@@ -49,10 +49,7 @@ _objects = [];
 	_objData = [];
 
 	{
-		if (!isNil "_x") then
-		{
-			_objData pushBack [(_vars select _forEachIndex) select 1, _x];
-		};
+		_objData pushBack [(_vars select _forEachIndex) select 1, _x];
 	} forEach _x;
 
 	_objects pushBack _objData;

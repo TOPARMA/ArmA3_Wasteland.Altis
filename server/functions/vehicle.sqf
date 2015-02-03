@@ -179,7 +179,12 @@ while {_run} do
 				_desertedTimeout = 0;
 			};
 		};
-
+        
+		// Check if owned vehicle. Added for not despawning owned town vehicles.
+		if ((alive _veh) && {not(isNil {_veh getVariable "ownerUID"})}) then {
+		    _dead = false;
+		};
+		
 		// Respawn vehicle
 		if (_dead) then
 		{

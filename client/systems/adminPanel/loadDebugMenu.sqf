@@ -23,10 +23,9 @@ if (_uid call isAdmin) then
 					"Access General Store",
 					"Access ATM Interface",
 					"Access Vehicle Store",
-					"Access ATM Dialog",
 					"Access Respawn Dialog",
 					"Access Proving Grounds",
-					"Show Server FPS"
+	                "Show Server FPS"
 	];
 
 	{

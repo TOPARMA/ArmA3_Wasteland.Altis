@@ -26,8 +26,8 @@ savePlayerHandle = _this spawn
 		_info =
 		[
 			["Name", name player],
-			["LastSide", str playerSide]//,
-			//["BankMoney", player getVariable ["bmoney", 0]] // NOTE: Bank money saving has been moved server-side
+			["LastSide", str playerSide],
+			["BankMoney", player getVariable ["bmoney", 0]]
 		];
 
 		_data = [player] call fn_getPlayerData;

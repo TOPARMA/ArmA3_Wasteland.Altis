@@ -335,9 +335,9 @@ _locMap ctrlAddEventHandler ["Draw",
 {
 	_ctrl = _this select 0;
 
-	if (!isNil "A3W_mapDraw_eventCode") then
+	if (!isNil "drawPlayerMarkers_array") then
 	{
-		_this call A3W_mapDraw_eventCode;
+		{ _ctrl drawIcon _x } forEach drawPlayerMarkers_array;
 	};
 
 	_spawnLoc = uiNamespace getVariable "RespawnSelectionDialog_selLocPos";

@@ -4,6 +4,9 @@
 //	@file Name: oSave.sqf
 //	@file Author: AgentRev, [GoT] JoSchaap
 
+_objectIDs = _this select 0;
+_vehicleIDs = _this select 1;
+
 #include "functions.sqf"
 
 A3W_saveableObjects = [];
@@ -38,6 +41,7 @@ fn_manualObjectSave = [_worldDir, "fn_manualObjectSave.sqf"] call mf_compile;
 fn_manualObjectDelete = [_worldDir, "fn_manualObjectDelete.sqf"] call mf_compile;
 fn_saveObject = [_methodDir, "saveObject.sqf"] call mf_compile;
 fn_postObjectSave = [_methodDir, "postObjectSave.sqf"] call mf_compile;
+fn_deleteObjects = [_methodDir, "deleteObjects.sqf"] call mf_compile;
 fn_saveWarchestMoney = [_methodDir, "saveWarchestMoney.sqf"] call mf_compile;
 
 if (_vehicleSaving) then
@@ -48,6 +52,7 @@ if (_vehicleSaving) then
 	fn_manualVehicleDelete = [_worldDir, "fn_manualVehicleDelete.sqf"] call mf_compile;
 	fn_saveVehicle = [_methodDir, "saveVehicle.sqf"] call mf_compile;
 	fn_postVehicleSave = [_methodDir, "postVehicleSave.sqf"] call mf_compile;
+	fn_deleteVehicles = [_methodDir, "deleteVehicles.sqf"] call mf_compile;
 };
 
 if (_savingMethod == "iniDB") then
@@ -101,10 +106,9 @@ while {true} do
 		call fn_saveWarchestMoney;
 	};
 
-	_oldIDs = A3W_objectIDs - _newObjectIDs;
-	A3W_objectIDs = _newObjectIDs;
+	[_objectIDs - _newObjectIDs, _objCount] call fn_postObjectSave;
 
-	[_oldIDs, _objCount] call fn_postObjectSave;
+	_objectIDs = _newObjectIDs;
 
 	uiSleep _savingInterval;
 
@@ -133,9 +137,8 @@ while {true} do
 
 		diag_log format ["A3W - %1 vehicles have been saved with %2", _vehCount, call A3W_savingMethodName];
 
-		_oldIDs = A3W_vehicleIDs - _newVehicleIDs;
-		A3W_vehicleIDs = _newVehicleIDs;
+		[_vehicleIDs - _newVehicleIDs, _vehCount] call fn_postVehicleSave;
 
-		[_oldIDs, _vehCount] call fn_postVehicleSave;
+		_vehicleIDs = _newVehicleIDs;
 	};
 };
