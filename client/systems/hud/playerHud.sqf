@@ -289,7 +289,7 @@ while {true} do
 	// Global voice warning system
 	if (_globalVoiceWarnTimer > 0 && _globalVoiceMaxWarns > 0) then
 	{
-		if (!isNull findDisplay 55 && (ctrlText (findDisplay 63 displayCtrl 101) == localize "str_channel_global" || ctrlText (findDisplay 63 displayCtrl 101) == localize "str_channel_side")) then
+		if (!isNull findDisplay 55 && {(ctrlText (findDisplay 63 displayCtrl 101) == localize "str_channel_global" || ctrlText (findDisplay 63 displayCtrl 101) == localize "str_channel_side") && !((getPlayerUID player) call isAdmin)}) then
 		{
 			if (isNil "_globalVoiceTimestamp") then
 			{
@@ -314,7 +314,7 @@ while {true} do
 						_msgTitle spawn
 						{
 							_this hintC parseText "You will be kicked/banned for using VON in GLOBAL/SIDE channels. Download TeamSpeak and join TS.TOPARMA.COM. <br/><br/> <t color='#ff0000'>How to unbind Push to Talk and default to Group:</t><br/> <img size='30'  image='client\images\information\von.jpg'/>";
-						};						
+						};
 					}
 					else
 					{
