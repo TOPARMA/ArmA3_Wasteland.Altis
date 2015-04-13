@@ -277,9 +277,9 @@ accessoriesArray = compileFinal str
 
 	["Sound Suppressor (9.3 mm Black)", "muzzle_snds_93mmg", 125, "item"],
 	["Sound Suppressor (9.3 mm Tan)", "muzzle_snds_93mmg_tan", 125, "item"],
-	["Sound Suppressor (.338 Black)", " muzzle_snds_338_black", 125, "item"],
-	["Sound Suppressor (.338 Green)", " muzzle_snds_338_green", 125, "item"],
-	["Sound Suppressor (.338 Sand)", " muzzle_snds_338_sand", 125, "item"],
+	["Sound Suppressor (.338 Black)", "muzzle_snds_338_black", 125, "item"],
+	["Sound Suppressor (.338 Green)", "muzzle_snds_338_green", 125, "item"],
+	["Sound Suppressor (.338 Sand)", "muzzle_snds_338_sand", 125, "item"],
 
 	["AMS (Black)", "optic_AMS", 200, "item"],
 	["AMS (Khaki)", "optic_AMS_khk", 200, "item"],
