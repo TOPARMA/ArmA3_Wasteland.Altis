@@ -471,7 +471,7 @@ uniformArray = compileFinal str
 	["Polo (Burgundy)", "U_C_Poloshirt_burgundy", 25, "uni"],
 	["Polo (Blue/green)", "U_C_Poloshirt_stripped", 25, "uni"],*/
 	["Polo (Competitor)", "U_Competitor", 25, "uni"],
-	["Polo (Rangemaster)", "U_Rangemaster", 25, "uni"],
+	["Polo (Rangemaster)", "U_Rangemaster", 25, "uni"]
 	/*["Racing Suit (Black)", "U_C_Driver_1_black", 25, "uni"], // can only be worn by civilian units
 	["Racing Suit (Blue)", "U_C_Driver_1_blue", 25, "uni"],
 	["Racing Suit (Green)", "U_C_Driver_1_green", 25, "uni"],
@@ -483,9 +483,9 @@ uniformArray = compileFinal str
 	["Racing Suit (Bluking)", "U_C_Driver_2", 25, "uni"],
 	["Racing Suit (Redstone)", "U_C_Driver_3", 25, "uni"],
 	["Racing Suit (Vrana)", "U_C_Driver_4", 25, "uni"],*/
-	["Tron Light Suit (Blue)", "U_B_Protagonist_VR", 5000, "uni"],
-	["Tron Light Suit (Red)", "U_O_Protagonist_VR", 5000, "uni"],
-	["Tron Light Suit (Green)", "U_I_Protagonist_VR", 5000, "uni"]
+	//["Tron Light Suit (Blue)", "U_B_Protagonist_VR", 5000, "uni"],
+	//["Tron Light Suit (Red)", "U_O_Protagonist_VR", 5000, "uni"],
+	//["Tron Light Suit (Green)", "U_I_Protagonist_VR", 5000, "uni"]
 ];
 
 vestArray = compileFinal str
