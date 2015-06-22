@@ -36,6 +36,10 @@ if (isPlayer _killer) then
 	{
 		_scoreColumn = if (_enemyKill) then { "playerKills" } else { "teamKills" };
 		_scoreValue = 1;
+		if (_scoreColumn == "teamKills") then
+		{
+			[format ["insertOrUpdateTeamKiller:%1:%2:%3", getPlayerUID _killer, call A3W_extDB_ServerID, call A3W_extDB_MapID]] call extDB_Database_async;
+		};
 	}
 	else
 	{
