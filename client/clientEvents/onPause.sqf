@@ -15,6 +15,7 @@ waitUntil {!isNull findDisplay 49}; // 49 = Esc menu
 
 _getPublicVar = if (!isNil "getPublicVar") then { getPublicVar } else { missionNamespace getVariable "getPublicVar" };
 _isConfigOn = if (!isNil "isConfigOn") then { isConfigOn } else { missionNamespace getVariable "isConfigOn" };
+_isUnconscious = if (!isNil "A3W_fnc_isUnconscious") then { A3W_fnc_isUnconscious } else { missionNamespace getVariable "A3W_fnc_isUnconscious" };
 
 if (!isNil "_getPublicVar" && !isNil "_isConfigOn") then
 {
@@ -23,7 +24,7 @@ if (!isNil "_getPublicVar" && !isNil "_isConfigOn") then
 		disableSerialization;
 		while {!isNull findDisplay 49} do
 		{
-			if (!alive player || player getVariable ["playerSpawning", false]) then
+			if (!alive player || (player getVariable ["playerSpawning", false] && !(missionNamespace getVariable ["playerData_ghostingTimer", false]))) then
 			{
 				_respawnBtn = (findDisplay 49) displayCtrl 1010;
 				if (ctrlEnabled _respawnBtn) then
@@ -49,7 +50,7 @@ if (!isNil "_getPublicVar" && !isNil "_isConfigOn") then
 		{
 			_preventAbort =
 			{
-				_unconscious = (player getVariable ["FAR_isUnconscious", 0] == 1);
+				_unconscious = player call _isUnconscious;
 				_timeStamp = ["combatTimestamp", -1] call _getPublicVar;
 				(!isNull findDisplay 49 && ((_timeStamp != -1 && diag_tickTime - _timeStamp < _abortDelay) || _unconscious))
 			};

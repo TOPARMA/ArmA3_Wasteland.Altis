@@ -40,8 +40,12 @@ spawnActionHandle = (_this select 1) spawn
 			default { player setVariable ["cmoney", _baseMoney, true]; };
 		};
 
-		[MF_ITEMS_CANNED_FOOD, 1] call mf_inventory_add;
-		[MF_ITEMS_WATER, 1] call mf_inventory_add;
+		if (["A3W_survivalSystem"] call isConfigOn) then
+		{
+			[MF_ITEMS_CANNED_FOOD, 1] call mf_inventory_add;
+			[MF_ITEMS_WATER, 1] call mf_inventory_add;
+		};
+
 		[MF_ITEMS_REPAIR_KIT, 1] call mf_inventory_add;
 	};
 

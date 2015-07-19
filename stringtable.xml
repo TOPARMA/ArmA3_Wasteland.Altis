@@ -36,7 +36,7 @@
 	</Package>
 	<Package name="WelcomeMessage">
 		<Key ID="STR_WL_WelcomeToWasteland">
-			<English>&lt;t color='#FF8000' size='2.5' &gt;TOP Wasteland Altis v1.1b &lt;/t&gt;</English>
+			<English>&lt;t color='#FF8000' size='2.5' &gt;TOP Wasteland Altis v1.2 &lt;/t&gt;</English>
 		</Key>
 		<Key ID="STR_WL_YouAreInTeam">
 			<English>&lt;t color='#FFFFFF' size='1' &gt;* You are on &lt;img size="1.5" image="%1"/&gt; &lt;t color="%2"&gt; %3 &lt; /t &gt;&lt; /t &gt; team. &lt;br/&gt;&lt;t color='#FFFFFF' size='1' &gt;* &lt;t color="#FF1111"&gt;ATTACKING or STEALING&lt;/t&gt;&lt;t color='#FFFFFF' size='1' &gt; from other &lt;t color="%2"&gt; %4 &lt; /t &gt;&lt;t color='#FFFFFF' size='1' &gt; players is &lt;t color="#FF1111"&gt;BANNABLE&lt;/t&gt;&lt;br/&gt;&lt;t color='#FFFFFF' size='1' &gt;* Punish Teamkillers to move to Indie. 10+ Teamkills = Permanently Indie (Automated) </English>

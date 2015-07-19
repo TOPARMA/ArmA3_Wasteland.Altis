@@ -11,6 +11,7 @@
 // Check if both players are on the same side, and that our player is BLUFOR or OPFOR, or that both are in the same group
 #define FRIENDLY_CONDITION (side group _x == playerSide && {playerSide in [BLUFOR,OPFOR] || group _x == group player})
 #define DISABLE_ALL_BUTTONS format ["{ ctrlEnable [_x, false] } forEach %1;", [respawn_Random_Button, respawn_Spawn_Button, respawn_Locations_Type, respawn_Locations_List, respawn_Preload_Checkbox]]
+#define TOWN_SPAWN_COOLDOWN (["A3W_townSpawnCooldown", 5*60] call getPublicVar)
 #define SPAWN_BEACON_COOLDOWN (["A3W_spawnBeaconCooldown", 5*60] call getPublicVar)
 #define BEACON_CHECK_RADIUS 250
 #define SPAWN_TOWN_COOLDOWN (["A3W_townSpawnCooldown", 5*60] call getPublicVar)
@@ -37,6 +38,7 @@ _locType = _display displayCtrl respawn_Locations_Type;
 _locList = _display displayCtrl respawn_Locations_List;
 _locMap = _display displayCtrl respawn_Locations_Map;
 
+_townSpawnCooldown = TOWN_SPAWN_COOLDOWN;
 _spawnBeaconCooldown = SPAWN_BEACON_COOLDOWN;
 _townSpawnCooldown = SPAWN_TOWN_COOLDOWN;
 
@@ -47,7 +49,7 @@ _side = switch (playerSide) do
 	default      { "Independent" };
 };
 
-_respawnText ctrlSetStructuredText parseText (format ["Welcome to Wasteland<br/>You are on %1. Please select a spawn point.", _side]);
+_respawnText ctrlSetStructuredText parseText (format ["Welcome to A3Wasteland<br/>You are on %1. Please select a spawn point.", _side]);
 respawnDialogActive = true;
 
 //buttonSetAction [respawn_Random_Button, format ["%1 [%2,0] execVM 'client\functions\spawnAction.sqf'", _disableAllButtons, respawn_Random_Button]];
@@ -86,7 +88,7 @@ _setPlayersInfo =
 	};
 
 	{
-		if (alive _x && !UNCONSCIOUS(_x) && {_x isKindOf "CAManBase"} && {_x distance _centerPos <= _maxRad}) then
+		if (alive _x && {_x isKindOf "CAManBase" && {!(_x call A3W_fnc_isUnconscious) && _x distance _centerPos <= _maxRad}}) then
 		{
 			if (FRIENDLY_CONDITION) then
 			{
@@ -242,9 +244,22 @@ _selLocChanged =
 			{
 				_isValid = true;
 				_location call _getPlayersInfo;
+				_lastSpawn = player getVariable (_location + "_lastSpawn");
+				_cooldown = false;
 
-				_text = "";
-				
+				if (!isNil "_lastSpawn") then
+				{
+					_townSpawnCooldown = TOWN_SPAWN_COOLDOWN;
+					_remaining = _townSpawnCooldown - (diag_tickTime - _lastSpawn);
+
+					if (_townSpawnCooldown > 0 && _remaining > 0) then
+					{
+						_textStr = _textStr + format ["[<t color='#ffff00'>%1</t>] ", _remaining call fn_formatTimer];
+						_cooldown = true;
+					};
+				};
+
+				if (_enemyPlayers > _friendlyPlayers) then
 				{
 				if (_x select 0 == _location) exitWith
 				{
@@ -277,14 +292,7 @@ _selLocChanged =
 				}
 				else
 				{
-					if (_enemyPlayers > _friendlyPlayers) then
-					{
-						_textStr = _textStr + "[<t color='#ff0000'>Blocked by enemy</t>] ";
-					}
-					else
-					{
-						_spawnBtnEnabled = true;
-					};
+					_spawnBtnEnabled = !_cooldown;
 				};
 			};
 		};
@@ -529,7 +537,21 @@ while {!isNull _display} do
 		}
 		else
 		{
-			_enabled = (_enemyPlayers <= _friendlyPlayers);
+			_lastSpawn = player getVariable (_location + "_lastSpawn");
+			_cooldown = false;
+
+			if (!isNil "_lastSpawn") then
+			{
+				_remaining = _townSpawnCooldown - (diag_tickTime - _lastSpawn);
+
+				if (_townSpawnCooldown > 0 && _remaining > 0) then
+				{
+					_picture = "\A3\ui_f\Data\gui\Rsc\RscDisplayMultiplayer\sessions_locked_ca.paa";
+					_cooldown = true;
+				};
+			};
+
+			_enabled = (!_cooldown && _enemyPlayers <= _friendlyPlayers);
 		};
 
 		if (isNil "_picture") then
