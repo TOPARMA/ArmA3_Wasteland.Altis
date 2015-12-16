@@ -36,7 +36,7 @@ waitUntil {!isNull player};
 waitUntil {time > 0.1};
 
 //disable environmental effects (ambient life + sound)
-enableEnvironment false;
+enableEnvironment true;
 
 removeAllWeapons player;
 player switchMove "";
