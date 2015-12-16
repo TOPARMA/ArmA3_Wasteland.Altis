@@ -115,7 +115,8 @@ camera_keyUpHandler = {
     _key in (actionKeys "MoveBack") ||
     _key in (actionKeys "TurnLeft") ||
     _key in (actionKeys "TurnRight") ||
-    _key in [DIK_Q, DIK_Z]) &&
+    _key in (actionKeys "HeliUp") ||
+    _key in (actionKeys "HeliDown")) &&
     (count(camera_key_tracker) == 0)) then {
     [_player,0] call camera_set_velocity;
   };
@@ -602,7 +603,7 @@ camera_update_nightvision = {
       false SetCamUseTi 0;
     };
     case 1: {
-      camera_unit commandChat format["Setting camera NV "];
+      camera_unit commandChat format["Setting camera NV"];
       camUseNVG true;
       false SetCamUseTi 0;
     };
@@ -627,22 +628,22 @@ camera_update_nightvision = {
       true SetCamUseTi 3;
     };
     case 6: {
-      camera_unit commandChat format["Setting camera light-orange-hot "];
+      camera_unit commandChat format["Setting camera light-orange-hot"];
       camUseNVG false;
       true SetCamUseTi 4;
     };
     case 7: {
-      camera_unit commandChat format["Setting camera dark-orange-hot "];
+      camera_unit commandChat format["Setting camera dark-orange-hot"];
       camUseNVG false;
       true SetCamUseTi 5;
     };
     case 8: {
-      camera_unit commandChat format["Setting camera orange body-heat "];
+      camera_unit commandChat format["Setting camera orange body-heat"];
       camUseNVG false;
       true SetCamUseTi 6;
     };
     case 9: {
-      camera_unit commandChat format["Setting camera colored body-heat "];
+      camera_unit commandChat format["Setting camera colored body-heat"];
       camUseNVG false;
       true SetCamUseTi 7;
     };
@@ -1227,7 +1228,8 @@ camera_update_key_tracker = {
     _key in (actionKeys "MoveBack") ||
     _key in (actionKeys "TurnLeft") ||
     _key in (actionKeys "TurnRight") ||
-    _key in [DIK_Q, DIK_Z])) exitWith {};
+    _key in (actionKeys "HeliUp") ||
+    _key in (actionKeys "HeliDown"))) exitWith {};
 
   if (_down && {(camera_key_tracker find _key) == -1}) then {
     camera_key_tracker set [count(camera_key_tracker),_key];
