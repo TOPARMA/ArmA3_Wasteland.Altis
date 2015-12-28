@@ -11,7 +11,22 @@
 #define ANIM "AinvPknlMstpSlayWrflDnon_medic"
 #define ERR_CANCELLED "Action Cancelled"
 #define ERR_IN_VEHICLE "Action Failed! You can't do this in a vehicle"
-private ["_hasFailed", "_success","_pos","_uid","_beacon"];
+#define MAX_BEACONS format ["You cannot deploy more then %1 spawnbeacons", [_MaxSpawnbeacons]]
+_MaxSpawnbeacons = ceil (["A3W_maxSpawnBeacons", 5] call getPublicVar);
+
+private ["_hasFailed", "_success","_pos","_uid","_beacon","_beacons","_ownedBeacons"];
+
+_beacons = []; 
+{ 
+	if (_x getVariable ["ownerUID",""] == getPlayerUID player) then 
+	{ 
+		_beacons pushBack _x; 
+	}; 
+} forEach pvar_spawn_beacons; 
+
+_ownedBeacons = count _beacons;
+
+
 _hasFailed = {
 	private ["_progress", "_failed", "_text"];
 	_progress = _this select 0;
@@ -20,6 +35,7 @@ _hasFailed = {
 		case (!alive player): {};
 		case (doCancelAction) :{doCancelAction = false; _text = ERR_CANCELLED;};
 		case (vehicle player != player): {_text = ERR_IN_VEHICLE};
+		case (_ownedBeacons >= _MaxSpawnbeacons): {_text = MAX_BEACONS; player spawn deleteBeacon};
 		default {
 			_text = format["Spawn Beacon %1%2 Deployed", round(_progress*100), "%"];
 			_failed = false;
@@ -50,8 +66,10 @@ if (_success) then {
 
 	pvar_spawn_beacons pushBack _beacon;
 	publicVariable "pvar_spawn_beacons";
-	pvar_manualObjectSave = netId _beacon;
-	publicVariableServer "pvar_manualObjectSave";
+
+  trackObject = _beacon;
+  publicVariableServer "trackObject";
+
 	["You placed the Spawn Beacon successfully!", 5] call mf_notify_client;
 };
 _success;
