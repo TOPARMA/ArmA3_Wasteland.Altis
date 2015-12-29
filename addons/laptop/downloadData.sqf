@@ -66,7 +66,8 @@ T8_fnc_ActionLaptop =
 	_caller = _this select 1;
 	_id = _this select 2;
 	
-	
+	player sideChat "Initializing...";
+	sleep random 5;
 	
 	_cIU = _laptop getVariable [ "InUse", false ];
 	if ( _cIU ) exitWith { player sideChat T8_varTLine02; };
