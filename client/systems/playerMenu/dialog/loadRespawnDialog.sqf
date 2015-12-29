@@ -244,29 +244,16 @@ _selLocChanged =
 			{
 				_isValid = true;
 				_location call _getPlayersInfo;
-				_lastSpawn = player getVariable (_location + "_lastSpawn");
-				_cooldown = false;
-
-				if (!isNil "_lastSpawn") then
-				{
-					_townSpawnCooldown = TOWN_SPAWN_COOLDOWN;
-					_remaining = _townSpawnCooldown - (diag_tickTime - _lastSpawn);
-
-					if (_townSpawnCooldown > 0 && _remaining > 0) then
-					{
-						_textStr = _textStr + format ["[<t color='#ffff00'>%1</t>] ", _remaining call fn_formatTimer];
-						_cooldown = true;
-					};
-				};
-
-				if (_enemyPlayers > _friendlyPlayers) then
+				
+				_text = "";
+				
 				{
 				if (_x select 0 == _location) exitWith
 				{
 					_text = (_x select 2);
 				};
 				} forEach (call cityList);
-				
+
 				_lastUseTown = player getVariable _text;
 
 				if (!isNil "_lastUseTown") then
@@ -292,7 +279,14 @@ _selLocChanged =
 				}
 				else
 				{
-					_spawnBtnEnabled = !_cooldown;
+					if (_enemyPlayers > _friendlyPlayers) then
+					{
+						_textStr = _textStr + "[<t color='#ff0000'>Blocked by enemy</t>] ";
+					}
+					else
+					{
+						_spawnBtnEnabled = true;
+					};
 				};
 			};
 		};
