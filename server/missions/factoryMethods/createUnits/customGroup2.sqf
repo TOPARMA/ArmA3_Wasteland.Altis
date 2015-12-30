@@ -10,6 +10,8 @@ private ["_group", "_pos", "_leader", "_man2", "_man3", "_man4", "_man5", "_man6
 
 _group = _this select 0;
 _pos = _this select 1;
+_nbUnits = param [2, 7, [0]];
+_radius = param [3, 10, [0]];
 
 // Leader
 _leader = _group createUnit ["C_man_polo_1_F", [(_pos select 0) + 10, _pos select 1, 0], [], 1, "Form"];

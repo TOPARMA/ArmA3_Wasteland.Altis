@@ -24,7 +24,7 @@ _weaponTypes = ["srifle_EBR_ARCO_pointer_F","LMG_Mk200_MRCO_F","arifle_Katiba_GL
 
 _group = _this select 0;
 _position = _this select 1;
-_rank = [_this, 2, "", [""]] call BIS_fnc_param;
+_rank = param [2, "", [""]];
 
 _soldier = _group createUnit [_soldierTypes call BIS_fnc_selectRandom, _position, [], 0, "NONE"];
 _soldier addUniform (_uniformTypes call BIS_fnc_selectRandom);

@@ -127,13 +127,7 @@ else
 		_data pushBack "Money";
 	};
 
-	_columns = "";
-
-	{
-		_columns = _columns + ((if (_columns != "") then { "," } else { "" }) + _x);
-	} forEach _data;
-
-	_result = [format ["getPlayerSave:%1:%2:%3", _UID, call A3W_extDB_MapID, _columns], 2] call extDB_Database_async;
+	_result = [format ["getPlayerSave:%1:%2:%3", _UID, call A3W_extDB_MapID, _data joinString ","], 2] call extDB_Database_async;
 
 	{
 		_data set [_forEachIndex, [_data select _forEachIndex, _x]];
